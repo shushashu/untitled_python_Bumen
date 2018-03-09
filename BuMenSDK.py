@@ -171,7 +171,7 @@ def assetAdd(token,data):
 def assetSent(token,data):
     url_asset_sent=__url__+"/asset/v1/send"
     data["sign"]=rnMD5(data)
-    print(data)
+    # print(data)
     req=requests.post(url_asset_sent,token,json=data,verify=False)
     return req.json(),writelog(data["trade_no"],req.json())
 
