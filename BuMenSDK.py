@@ -9,6 +9,7 @@ __client_id__ = "1d60edfa67af7e1ce4ac1dab40577e6c"
 __client_secret__ = "803da2e4d8a8b96726c96a04b912b5b5"
 __log__=True
 
+
 #构造一个trade_no
 #当下时间戳+时间戳和时间戳的2倍之间的随机数之后，补齐25位唯一tradeNum
 def createTradeNo(type):
@@ -17,7 +18,7 @@ def createTradeNo(type):
     T=int(time.time())
     R=int(random.randint(T,T+T))
     trade_no=type+str(T)+"x"+str(R)
-    return trade_no.zfill(40)
+    return trade_no.zfill(32)
 
 #日志
 def writelog(*params):
@@ -59,9 +60,11 @@ def userDataIO(*params):
 def rnMD5(*params):
     stringA=("asset_amount=%s&asset_code=%s&current_string=%s&from_bubi_address=%s&to_bubi_address=%s&trade_no=%s"%(params[0]["asset_amount"],params[0]["asset_code"],params[0]["current_string"],params[0]["from_bubi_address"],params[0]["to_bubi_address"],params[0]["trade_no"]))
     stringA=stringA+("&key=%s"%__client_secret__)
+    # stringA = "asset_amount=1&asset_code=2UX4xvQ4aWzemiS3R2FfWeyLdHDhbzzwitPcJHoPtAC5ZA2en5dxMhyagPyHxKLZZXCQYobP2W87KRjP3QyjPkbX5F28WUCLVZSGMt4mD4n5T7d9QwVaCd9Z6ZoTRS4fbi5e3SVmFLbmu96i&current_string=0000000000000001522052770147user&from_bubi_address=bubiV8hv8d7vBDeyrui8KiLmE4EU4id4UoQ1UKRu&to_bubi_address=bubiV8iDawDHmNdnZ9qwKy2cL6jeCN1SbCsuiVhV& trade_no=00000000001522052775784assetSend&key=privbxxXe9MLSFuxAfSePhVZYKxbGwgrNfnNTFjGxXs46GtMUMg47KCg"
     stringA=stringA.encode(encoding='utf-8')
     m2=hashlib.md5()
     m2.update(stringA)
+    # print("stringA",stringA,m2.hexdigest())
     return m2.hexdigest()
 
 #创建全局唯一票据号
@@ -172,7 +175,7 @@ def assetSent(token,data):
     url_asset_sent=__url__+"/asset/v1/send"
     data["sign"]=rnMD5(data)
     # print(data)
-    req=requests.post(url_asset_sent,token,json=data,verify=False)
+    req=requests.post(url_asset_sent,params=token,json=data,verify=False)
     return req.json(),writelog(data["trade_no"],req.json())
 
 #资产转移状态查询
