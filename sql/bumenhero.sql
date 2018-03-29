@@ -30,3 +30,5 @@ CREATE TABLE assetcreateand(
   asset_amount INT NOT NULL
 )
 
+
+# UPDATE userinfo SET password = "6473883" ,trade_no = "12313131" WHERE bubi_address = "bubiV8i7jAPmVsPo5FQ8qfH8KHP5bG2kMtURUDij";

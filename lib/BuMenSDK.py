@@ -68,15 +68,17 @@ def rnMD5(*params):
     return m2.hexdigest()
 
 #创建全局唯一票据号
-def access_Token():
-    grant_type="client_credentials"
-    urlAccessToken=__url__+"/oauth2/token"
-    header={'Content-Type':'application/x-www-form-urlencoded'}
-    postData={'client_id':__client_id__,'client_secret':__client_secret__,'grant_type':grant_type}
-    # ssl._create_default_https_context = ssl._create_unverified_context
-    req=requests.post(urlAccessToken,params=postData,headers=header,verify=False)
-    # print(req.url)
-    return req.json()
+def access_Token(func):
+    def wrapper():
+        grant_type="client_credentials"
+        urlAccessToken=__url__+"/oauth2/token"
+        header={'Content-Type':'application/x-www-form-urlencoded'}
+        postData={'client_id':__client_id__,'client_secret':__client_secret__,'grant_type':grant_type}
+        # ssl._create_default_https_context = ssl._create_unverified_context
+        req=requests.post(urlAccessToken,params=postData,headers=header,verify=False)
+        # print(req.url)
+        return func(req.json()["access_token"])
+    return wrapper
 
 #创建用户
 #使用需要传入用户用户名和用户密码，还有其他的待验证数据
@@ -85,6 +87,7 @@ def access_Token():
 #     "password": password,
 #     "trade_no":trade_no
 # }
+@access_Token
 def createUser(userdate,token):
     urlCreateUser =__url__+"/account/v1/register"
     req=requests.post(urlCreateUser,params=token,json=userdate,verify=False)
@@ -104,8 +107,8 @@ def selectIsUser(trade_no,token):
 # 	"trade_no":trade_no
 # }
 def resetUser(token,data):
-    urlresetuser=__url__+"/account/v1/alterPwd"
-    req=requests.post(urlresetuser,params=token,json=data,verify=False)
+    urlresetuser=__url__+"/account/v1/alterPwd?access_token="+token
+    req=requests.post(urlresetuser,json=data,verify=False)
     return req.json(),writelog(data["trade_no"],req.json())
 
 #获取账户信息
