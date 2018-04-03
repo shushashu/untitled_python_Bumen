@@ -67,17 +67,28 @@ def rnMD5(*params):
     # print("stringA",stringA,m2.hexdigest())
     return m2.hexdigest()
 
-#创建全局唯一票据号
-def access_Token(func):
-    def wrapper():
-        grant_type="client_credentials"
-        urlAccessToken=__url__+"/oauth2/token"
-        header={'Content-Type':'application/x-www-form-urlencoded'}
-        postData={'client_id':__client_id__,'client_secret':__client_secret__,'grant_type':grant_type}
-        # ssl._create_default_https_context = ssl._create_unverified_context
-        req=requests.post(urlAccessToken,params=postData,headers=header,verify=False)
-        # print(req.url)
-        return func(req.json()["access_token"])
+# 创建全局唯一票据号
+def access_Token():
+    grant_type="client_credentials"
+    urlAccessToken=__url__+"/oauth2/token"
+    header={'Content-Type':'application/x-www-form-urlencoded'}
+    postData={'client_id':__client_id__,'client_secret':__client_secret__,'grant_type':grant_type}
+    # ssl._create_default_https_context = ssl._create_unverified_context
+    req=requests.post(urlAccessToken,params=postData,headers=header,verify=False)
+    # print(req.url)
+    return req.json()["access_token"]
+
+def access_token(func):
+    def wrapper(*args, **kwargs):
+        kwargs["token"] = access_Token()
+        # print(kwargs["token"])
+        return func(*args, **kwargs)
+    return wrapper
+# 装饰器创建trade_nos
+def Ttrade_no(func):
+    def wrapper(*args,**kwargs):
+        kwargs["trade_no"] = createTradeNo(kwargs["trade_no"])
+        return func(*args,**kwargs)
     return wrapper
 
 #创建用户
@@ -87,15 +98,18 @@ def access_Token(func):
 #     "password": password,
 #     "trade_no":trade_no
 # }
-@access_Token
+
+@access_token
 def createUser(userdate,token):
-    urlCreateUser =__url__+"/account/v1/register"
+    print(userdate,token)
+    urlCreateUser =__url__+"/account/v1/register?access_token="+token
     req=requests.post(urlCreateUser,params=token,json=userdate,verify=False)
     return req.json(),writelog(userdate["trade_no"],req.json())
 
 #查询账户注册状态
+@access_token
 def selectIsUser(trade_no,token):
-    urlselectuser=__url__+"/status/account/v1/register"
+    urlselectuser=__url__+"/status/account/v1/register?access_token="+token
     token["trade_no"]=trade_no
     req=requests.get(urlselectuser,params=token,verify=False)
     return req.json(),writelog(trade_no,req.json())
@@ -106,12 +120,14 @@ def selectIsUser(trade_no,token):
 # 	"new_password":"gmc2188195",
 # 	"trade_no":trade_no
 # }
+@access_token
 def resetUser(token,data):
     urlresetuser=__url__+"/account/v1/alterPwd?access_token="+token
     req=requests.post(urlresetuser,json=data,verify=False)
     return req.json(),writelog(data["trade_no"],req.json())
 
 #获取账户信息
+@access_token
 def getUser(user_bubi_address,token):
     # access_token=access_Token()
     urlgetuser=__url__+"/account/v1/info"
@@ -129,6 +145,7 @@ def getUser(user_bubi_address,token):
 # 		"asset_amount":"21300",
 # 		"metadata": "{\"asset_type\":\"10600\",\"asset_unit_code\":\"15\",\"asset_description\":\"xxxxxxxxxxx\"}"
 # 	}
+@access_token
 def assetCogradient(assetdata,token):
     urlasset=__url__+"/asset/v1/issue"
     req=requests.post(urlasset,params=token,json=assetdata,verify=False,)
@@ -136,6 +153,7 @@ def assetCogradient(assetdata,token):
 
 
 #查询资产详情
+@access_token
 def assetSelect(asset_code,token):
     url_asset_select=__url__+"/asset/v1/showDetail"
     token["asset_code"]=asset_code
@@ -143,6 +161,7 @@ def assetSelect(asset_code,token):
     return req.json(),writelog(req.json())
 
 #查询资产发行状态
+@access_token
 def assetIssue(trade_no,token):
     url_asset_issue=__url__+"/status/asset/v1/issue"
     token["trade_no"]=trade_no
@@ -157,6 +176,7 @@ def assetIssue(trade_no,token):
 # 	"asset_amount": "10000",
 # 	"metadata": "{\"asset_type\":\"10600\",\"asset_unit_code\":\"15\",\"asset_description\":\"闪避狂暴甲\"}"
 # }
+@access_token
 def assetAdd(token,data):
     url_asset_add=__url__+"/asset/v1/add2Issue"
     req=requests.post(url_asset_add,params=token,json=data,verify=False)
@@ -174,6 +194,7 @@ def assetAdd(token,data):
 # 	"metadata" : "{\"sub_tx_type\":\"10100\"}",
 # 	"sign" : "kfB53Q4aSJmDLyKguiP6mG5bee2XmtbTNQ2"#签名
 # }
+@access_token
 def assetSent(token,data):
     url_asset_sent=__url__+"/asset/v1/send"
     data["sign"]=rnMD5(data)
@@ -182,6 +203,7 @@ def assetSent(token,data):
     return req.json(),writelog(data["trade_no"],req.json())
 
 #资产转移状态查询
+@access_token
 def assetSentIsure(token,trade_no):
     url_asset_sent_Issure=__url__+"/status/asset/v1/send"
     token["trade_no"]=trade_no
