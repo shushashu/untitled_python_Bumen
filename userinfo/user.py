@@ -64,7 +64,7 @@ class CreateUser(User):
 
     def selectIsUser(self):
         # 查询用户注册测状态
-        if BuMenSDK.selectIsUser(self.trade_no, self.token)[0]["err_code"] == "0":
+        if BuMenSDK.selectIsUser(self.trade_no)[0]["err_code"] == "0":
             self.__status = 1
         else:
             self.__status = 0

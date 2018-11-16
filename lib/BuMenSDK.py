@@ -135,8 +135,10 @@ def createUser(user_name, nickname, password, trade_no, metadata, token):
 @access_token
 def selectIsUser(trade_no, token):
     urlselectuser = __url__ + "/status/account/v1/register?access_token=" + token
-    token["trade_no"] = trade_no
-    req = requests.get(urlselectuser, params=token, verify=False)
+    data = {
+        'trade_no': trade_no
+    }
+    req = requests.get(urlselectuser, params=data, verify=False)
     return req.json(), writelog(trade_no, req.json())
 
 
