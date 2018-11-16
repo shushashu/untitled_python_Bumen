@@ -44,6 +44,7 @@ class CreateUser(User):
             "nickname": self.nickname,
         }
         self.a = BuMenSDK.createUser(**userdata)
+        self.trade_no = self.a[1]
         return int(self.a[0]["err_code"])
 
     def sql(self):

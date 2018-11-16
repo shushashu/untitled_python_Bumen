@@ -128,7 +128,7 @@ def createUser(user_name, nickname, password, trade_no, metadata, token):
     print(userdate, token)
     urlCreateUser = __url__ + "/account/v1/register?access_token=" + token
     req = requests.post(urlCreateUser, json=userdate, verify=False)
-    return req.json(), writelog(userdate["trade_no"], req.json())
+    return req.json(), trade_no, writelog(userdate["trade_no"], req.json())
 
 
 # 查询账户注册状态
@@ -154,7 +154,7 @@ def resetUser(token, trade_no, data):
     urlresetuser = __url__ + "/account/v1/alterPwd?access_token=" + token
     data.update(trade_no=trade_no)
     req = requests.post(urlresetuser, json=data, verify=False)
-    return req.json(), writelog(data["trade_no"], req.json())
+    return req.json(), trade_no, writelog(data["trade_no"], req.json())
 
 
 # 获取账户信息
