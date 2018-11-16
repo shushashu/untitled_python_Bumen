@@ -2,8 +2,9 @@ from lib import mysql
 from lib import BuMenSDK
 
 
-class user(object):
+class User(object):
     __status = ""
+
     def __init__(self, trade_no, token, username, password, **kwargs):
         self.username = username
         self.password = password
@@ -29,11 +30,11 @@ class user(object):
 
 
 # 创建用户
-class createuser(user):
+class CreateUser(User):
     __sql = "INSERT INTO userinfo (nickname, password, trade_no, bubi_address,myset,username,statu) VALUES ( '{}', '{}', '{}','{}','{}', '{}','{}' )"
 
     def __init__(self, trade_no, token, username, password, metadata, nickname, **kwargs):
-        user.__init__(self, trade_no, token, username, password, **kwargs)
+        super().__init__(trade_no=trade_no, token=token, username=username, password=password, **kwargs)
         self.nickname = nickname
         self.metadata = metadata
 
@@ -43,12 +44,13 @@ class createuser(user):
             "password": self.password,
             "trade_no": self.trade_no,
             "metadata": self.metadata,
+            "nickname": self.nickname,
         }
-        self.a = BuMenSDK.createUser(userdata, self.token)
+        self.a = BuMenSDK.createUser(token=self.token, **userdata)
         return int(self.a[0]["err_code"])
 
     def sql(self):
-        sql =self.__sql.format (
+        sql = self.__sql.format(
             self.nickname,
             self.password,
             self.trade_no,
@@ -70,11 +72,12 @@ class createuser(user):
 
 
 # 账户重置
-class resetuser(user):
+class ResetUser(User):
     __sql = 'UPDATE userinfo SET password = "{}" ,trade_no = "{}" WHERE username = "{}"'
-    __status =""
+    __status = ""
+
     def __init__(self, trade_no, token, username, password, **kwargs):
-        user.__init__(self, trade_no, token, username, password, **kwargs)
+        super().__init__(trade_no=trade_no, token=token, username=username, password=password, **kwargs)
 
     def resetuser(self):
         data = {
@@ -86,17 +89,13 @@ class resetuser(user):
         return a[0]
 
     def sql(self):
-        sql=self.__sql.format(
+        sql = self.__sql.format(
             self.password,
             self.trade_no,
             self.username
         )
         s = mysql.mysql(sql)
         return s.update()
-
-
-
-
 
 # 查询用户注册状态
 # token=BuMenSDK.access_Token()
@@ -109,5 +108,3 @@ class resetuser(user):
 # userdata=BuMenSDK.userDataIO()["1520254732"]
 # a=BuMenSDK.getUser(userdata["bubi_address"],token)
 # print(a)
-
-
