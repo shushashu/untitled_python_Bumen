@@ -5,11 +5,9 @@ from lib import BuMenSDK
 class User(object):
     __status = ""
 
-    def __init__(self, trade_no, token, username, password, **kwargs):
+    def __init__(self, username, password, **kwargs):
         self.username = username
         self.password = password
-        self.trade_no = trade_no
-        self.token = token
 
     def create_user(self):
         ###账户相关
@@ -33,8 +31,8 @@ class User(object):
 class CreateUser(User):
     __sql = "INSERT INTO userinfo (nickname, password, trade_no, bubi_address,myset,username,statu) VALUES ( '{}', '{}', '{}','{}','{}', '{}','{}' )"
 
-    def __init__(self, trade_no, token, username, password, metadata, nickname, **kwargs):
-        super().__init__(trade_no=trade_no, token=token, username=username, password=password, **kwargs)
+    def __init__(self, username, password, metadata, nickname, **kwargs):
+        super().__init__(username=username, password=password, **kwargs)
         self.nickname = nickname
         self.metadata = metadata
 
@@ -42,11 +40,10 @@ class CreateUser(User):
         userdata = {
             "user_name": self.username,
             "password": self.password,
-            "trade_no": self.trade_no,
             "metadata": self.metadata,
             "nickname": self.nickname,
         }
-        self.a = BuMenSDK.createUser(token=self.token, **userdata)
+        self.a = BuMenSDK.createUser(**userdata)
         return int(self.a[0]["err_code"])
 
     def sql(self):
@@ -76,22 +73,20 @@ class ResetUser(User):
     __sql = 'UPDATE userinfo SET password = "{}" ,trade_no = "{}" WHERE username = "{}"'
     __status = ""
 
-    def __init__(self, trade_no, token, username, password, **kwargs):
-        super().__init__(trade_no=trade_no, token=token, username=username, password=password, **kwargs)
+    def __init__(self, username, password, **kwargs):
+        super().__init__(username=username, password=password, **kwargs)
 
     def resetuser(self):
         data = {
             "user_name": self.username,
             "new_password": self.password,
-            "trade_no": self.trade_no,
         }
-        a = BuMenSDK.resetUser(token=self.token, data=data)
+        a = BuMenSDK.resetUser(data=data)
         return a[0]
 
     def sql(self):
         sql = self.__sql.format(
             self.password,
-            self.trade_no,
             self.username
         )
         s = mysql.mysql(sql)

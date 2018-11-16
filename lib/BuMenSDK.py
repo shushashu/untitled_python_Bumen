@@ -149,8 +149,10 @@ def selectIsUser(trade_no, token):
 # 	"trade_no":trade_no
 # }
 @access_token
-def resetUser(token, data):
+@Ttrade_no('user')
+def resetUser(token, trade_no, data):
     urlresetuser = __url__ + "/account/v1/alterPwd?access_token=" + token
+    data.update(trade_no=trade_no)
     req = requests.post(urlresetuser, json=data, verify=False)
     return req.json(), writelog(data["trade_no"], req.json())
 

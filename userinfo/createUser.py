@@ -2,12 +2,10 @@ from lib import BuMenSDK
 from userinfo import user
 
 # 配置用户数据
-trade_no = BuMenSDK.createTradeNo("user")
-token = BuMenSDK.access_Token()
 username, password, metadata, nickname = "test0243", "123123", "iammetadata", "nick032"
 
 # 创建用户
-user1 = user.CreateUser(trade_no, token, username, password, metadata, nickname)
+user1 = user.CreateUser(username, password, metadata, nickname)
 
 # 检查用户创建结果
 a = user1.create_user()
