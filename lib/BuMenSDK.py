@@ -5,7 +5,7 @@ from urllib import parse, request
 import ssl, time, datetime, json, requests, random, hashlib
 from functools import wraps
 
-__url__ = "https://api.bubidev.cn"
+__url__ = "https://testapi.bumeng.cn/"
 __client_id__ = "1d60edfa67af7e1ce4ac1dab40577e6c"
 __client_secret__ = "803da2e4d8a8b96726c96a04b912b5b5"
 __log__ = True
